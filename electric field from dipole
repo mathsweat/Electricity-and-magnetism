@@ -1,0 +1,78 @@
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
+import scipy.constants as sp
+import numpy as np
+
+
+
+# A dipole has -q charge located at x=-a and +q charge located at x=+a
+# Write a program that will take as input the values of charges, the a value, and the (x,y) coordinates of a point p 
+# to find the electric field at point p
+#the coordinates (a,x,y) should be inputted in µm and the charge (q) should be in nC
+
+
+
+pi=sp.pi
+e0=sp.epsilon_0
+k=(1/(4*pi*e0))
+
+
+
+def distance_formula(x1,x2,y2): #first coordinate is for a charge. We know it has a y coordintate of 0. The second if for p
+    r=(((x2-x1)**(0.5))+((y2)**(0.5)))**0.5
+    return r
+
+
+
+def field_calc(q,a,x,y):
+    #convert to SI units
+    q_si=q*(1/10**9)
+    a_si=a*(1/10**6)
+    x_si=x*(1/10**6)
+    y_si=y*(1/10**6)
+    
+    #for +q at x=+a
+    r=distance_formula(a,x,y)
+    E1=(k*q_si)/(r**2)
+    #sin and cos just from side lengths
+    E1x=E1*((x-a)/r)
+    E1y=E1*(y/r)
+    
+    #for -q at x=-a
+    a_neg= -a
+    r2=distance_formula(a_neg,x,y)
+    E2= -(k*q_si)/(r2**2)
+    E2x=E2*((x-a_neg)/r2)
+    E2y=E2*(y/r2)
+    
+    E_totx=E1x+E2x
+    E_toty=E1y+E2y
+    E_vector=(E_totx,E_toty)
+    return E_vector
+    
+    
+    
+q=float(input("Enter dipole charge in nC: "))
+a=float(input("Enter positive dipole x-coordinate (+q is at positive coordinate and -q at negative): "))
+numx=int(input("Enter (positive) range of x integer coordinates the Electric Field will encompass ex: 5 means x=-5 to x=5: "))
+numy=int(input("Enter (positive) range of y integer coordinates the Electric Field will encompass ex: 5 means y=-5 to y=5: "))
+figure(figsize=(8, 6), dpi=80)
+plt.grid()
+plt.xlabel("Electric field plot")
+plt.plot(a,0,"or") #positive charge is red circle
+plt.plot(-a,0,"ob") #negative charge is blue circle
+
+for i in range(-numx,numx):
+    for j in range(-numy,numy):
+        if(i!=a and j!=0):
+            E_vector=field_calc(q,a,i,j)
+            E_vectorx=E_vector[0]
+            E_vectory=E_vector[1]
+
+            xfin=i+E_vectorx
+            yfin=j+E_vectory
+
+            plt.plot (i,j,"og") #point p is green circle
+            plt.plot([i,xfin],[j,yfin])
+        
+plt.show()
